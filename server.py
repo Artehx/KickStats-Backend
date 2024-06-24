@@ -1,9 +1,10 @@
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests 
 
 app = Flask(__name__)
-
+CORS(app)
 # Members API Route
 
 @app.route("/buscarJugador", methods=['GET'])
