@@ -7,6 +7,7 @@ app = Flask(__name__)
 CORS(app)
 # Members API Route
 
+#Players
 @app.route("/buscarJugador", methods=['GET'])
 def buscar_jugador():
     try:
@@ -27,16 +28,47 @@ def buscar_jugador():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route("/buscarJugadorProfile", methods=['GET'])
+def busca_profile_jugador():
+    try:
+        id_player = request.args.get('id_player')
+        if not id_player:
+            return jsonify({'error': 'id player parameter is required'}), 400
 
-@app.route("/members")
-def members():
-    return {"members": ["Member1", "Member2"]}
+        api_url = f'https://transfermarkt-api.fly.dev/players/{id_player}/profile'
+        response = requests.get(api_url)
 
-@app.route("/cliente")
+        if response.status_code == 200:
+            results = response.json()
+        else:
+            results = {'error': 'Unable to fetch data from API'}
 
-def cliente():
-    return {"members": ["Arturo", "Se come a la prima del Jey"]}
+        return jsonify(results)
 
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+#Clubs
+@app.route("/getClubs", methods=['GET'])
+def getClubs():
+    try:
+        name_club = request.args.get('name_club')
+        if not name_club:
+            return jsonify({'error': 'name club is required'}), 400
+
+        api_url = f'https://transfermarkt-api.fly.dev/clubs/search/{name_club}'
+        response = requests.get(api_url)
+
+        if response.status_code == 200:
+            results = response.json()
+        else:
+            results = {'error': 'Unable to fetch data from API'}
+
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
 if __name__ == "__main__":
   app.run(debug=True)
 
