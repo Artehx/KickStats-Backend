@@ -7,6 +7,35 @@ app = Flask(__name__)
 CORS(app)
 # Members API Route
 
+#Register
+@app.route('/registerClient' , methods=['POST'])
+def register():
+
+    try:
+     data = request.json #Get the info of the body
+     dataClient = data.get('dataClient')
+     
+     return jsonify({'message': 'register ok', 'data': dataClient}) 
+     
+    except:
+      print(f'An exception occurred: {e}')
+      return jsonify({'error': 'something went wrong'})
+
+
+@app.route('/loginClient', methods=['POST'])
+def login():
+    
+    try:
+        datos = request.json;    
+        email = datos.get('email')
+        password = datos.get('password')
+
+        return jsonify({'message': 'login ok', 'email': email, 'password': password}) 
+
+    except Exception as e:
+        print(f'An exception occurred:{e}');
+        return jsonify({'error':'something went wrong'});
+    
 #Players
 @app.route("/buscarJugador", methods=['GET'])
 def buscar_jugador():
