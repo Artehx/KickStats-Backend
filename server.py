@@ -1,9 +1,20 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from pymongo import MongoClient
 import requests 
+import bcrypt
+
 
 app = Flask(__name__)
+
+client = MongoClient('localhost', 27017)
+
+
+db = client.KickStatsDB
+todos = db.todos
+
+print(f'Se ha conectado mongo en: {client}')
 CORS(app)
 # Members API Route
 
@@ -13,11 +24,26 @@ def register():
 
     try:
      data = request.json #Get the info of the body
-     dataClient = data.get('dataClient')
+     print(f'datos del cliente -> {email, password}')
+     email = data.get('email')
+     password = data.get('password')
      
-     return jsonify({'message': 'register ok', 'data': dataClient}) 
+
+     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+     password = hashed_password.decode('utf-8')
+
+     #Insercción de datos (registro)
      
-    except:
+     result = db.usuarios.insert_one(email, password)
+     print(f'se ha insertado correctamente {email, password}')
+
+
+     # Convertir ObjectId a cadena
+     result['_id'] = str(result.inserted_id)
+
+     return jsonify({'message': 'register ok', 'data': result}) 
+
+    except Exception as e:
       print(f'An exception occurred: {e}')
       return jsonify({'error': 'something went wrong'})
 
